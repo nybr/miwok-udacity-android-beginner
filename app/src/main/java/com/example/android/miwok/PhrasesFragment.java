@@ -57,8 +57,9 @@ public class PhrasesFragment extends Fragment {
 
                 // Pause playback and reset player to the start of the file. That way, we can
                 // play the word from the beginning when we resume playback.
-                mMediaPlayer.pause();
-                mMediaPlayer.seekTo(0);
+                /**mMediaPlayer.pause();
+                 mMediaPlayer.seekTo(0);**/
+                releaseMediaPlayer();
             } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
                 // The AUDIOFOCUS_GAIN case means we have regained focus and can resume playback.
                 mMediaPlayer.start();
@@ -80,6 +81,8 @@ public class PhrasesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.word_list, container, false);
+
+        releaseMediaPlayer();
 
         mAudioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
 
@@ -156,6 +159,15 @@ public class PhrasesFragment extends Fragment {
     public void onStop() {
         super.onStop();
 
+        // When the activity is pause, release the media player resources because we won't
+        // be playing any more sounds.
+        releaseMediaPlayer();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
         // When the activity is stopped, release the media player resources because we won't
         // be playing any more sounds.
         releaseMediaPlayer();
@@ -169,6 +181,7 @@ public class PhrasesFragment extends Fragment {
         if (mMediaPlayer != null) {
             // Regardless of the current state of the media player, release its resources
             // because we no longer need it.
+            mMediaPlayer.pause();
             mMediaPlayer.release();
 
             // Set the media player back to null. For our code, we've decided that

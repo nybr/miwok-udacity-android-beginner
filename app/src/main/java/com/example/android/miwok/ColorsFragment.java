@@ -17,7 +17,7 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ColorFragment extends Fragment {
+public class ColorsFragment extends Fragment {
 
     /**
      * Handles playback of all the sound files
@@ -57,8 +57,9 @@ public class ColorFragment extends Fragment {
 
                 // Pause playback and reset player to the start of the file. That way, we can
                 // play the word from the beginning when we resume playback.
-                mMediaPlayer.pause();
-                mMediaPlayer.seekTo(0);
+                /**mMediaPlayer.pause();
+                 mMediaPlayer.seekTo(0);**/
+                releaseMediaPlayer();
             } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
                 // The AUDIOFOCUS_GAIN case means we have regained focus and can resume playback.
                 mMediaPlayer.start();
@@ -71,7 +72,7 @@ public class ColorFragment extends Fragment {
     };
 
 
-    public ColorFragment() {
+    public ColorsFragment() {
         // Required empty public constructor
     }
 
@@ -80,6 +81,8 @@ public class ColorFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.word_list, container, false);
+
+        releaseMediaPlayer();
 
         mAudioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
 
@@ -154,6 +157,15 @@ public class ColorFragment extends Fragment {
     public void onStop() {
         super.onStop();
 
+        // When the activity is pause, release the media player resources because we won't
+        // be playing any more sounds.
+        releaseMediaPlayer();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
         // When the activity is stopped, release the media player resources because we won't
         // be playing any more sounds.
         releaseMediaPlayer();
@@ -165,6 +177,9 @@ public class ColorFragment extends Fragment {
     private void releaseMediaPlayer() {
         // If the media player is not null, then it may be currently playing a sound.
         if (mMediaPlayer != null) {
+
+            mMediaPlayer.pause();
+
             // Regardless of the current state of the media player, release its resources
             // because we no longer need it.
             mMediaPlayer.release();
